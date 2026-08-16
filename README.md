@@ -13,4 +13,9 @@ Our team's project repo for [DEVJAMS].
 
 ## Status
 Practice phase — setting up tools and learning basics before the hackathon.
+<<<<<<< HEAD
 ##jenil branch for hackathon
+=======
+##teting the pull request thing 
+## lesss gooo
+>>>>>>> frontend
