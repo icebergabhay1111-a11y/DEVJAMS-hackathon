@@ -12,3 +12,6 @@ Our team's project repo for [DEVJAMS].
 - TBD (Python/Flask backend, HTML/CSS/JS frontend)
 
 ## Status
+Practice phase — setting up tools and learning basics before the hackathon.
+##teting the pull request thing 
+## lesss gooo
