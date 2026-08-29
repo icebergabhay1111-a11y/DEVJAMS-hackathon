@@ -1,0 +1,11 @@
+# Firebase credentials
+serviceAccountKey.json
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment secrets
+.env
