@@ -10,6 +10,10 @@ app = FastAPI(title="NetramAI API")
 controller = SafetyController()
 
 
+# -----------------------------
+# Request Models
+# -----------------------------
+
 class SafeCallRequest(BaseModel):
     message: str
 
@@ -18,6 +22,15 @@ class EventRequest(BaseModel):
     event: str
 
 
+class CheckInRequest(BaseModel):
+    message: str
+    event: str
+
+
+# -----------------------------
+# Root Endpoint
+# -----------------------------
+
 @app.get("/")
 def root():
     return {
@@ -25,6 +38,10 @@ def root():
         "status": "running"
     }
 
+
+# -----------------------------
+# SafeCall Endpoint
+# -----------------------------
 
 @app.post("/safecall")
 def safecall(request: SafeCallRequest):
@@ -37,12 +54,34 @@ def safecall(request: SafeCallRequest):
     }
 
 
+# -----------------------------
+# Safety Event Endpoint
+# -----------------------------
+
 @app.post("/event")
 def handle_event(request: EventRequest):
 
     new_state = controller.handle_event(request.event)
 
     return {
+        "event": request.event,
+        "safety_state": new_state
+    }
+
+
+# -----------------------------
+# Combined SafeCall + Event
+# -----------------------------
+
+@app.post("/check-in")
+def check_in(request: CheckInRequest):
+
+    reply = safe_call(request.message)
+
+    new_state = controller.handle_event(request.event)
+
+    return {
+        "reply": reply,
         "event": request.event,
         "safety_state": new_state
     }
