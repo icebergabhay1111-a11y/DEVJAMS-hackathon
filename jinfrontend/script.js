@@ -2,192 +2,609 @@ let countdownInterval;
 let cameraStream = null;
 
 // ==========================================
-// 1. TIMERS & NAVIGATION
+// 1. BACKEND CONNECTION
 // ==========================================
+
+const API_URL = "http://127.0.0.1:8000";
+
+// ==========================================
+// 2. TIMER & NAVIGATION
+// ==========================================
+
 setInterval(() => {
-  const timeString = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  document.querySelectorAll('.clock').forEach(c => c.innerText = timeString);
+  const timeString = new Date().toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  document.querySelectorAll('.clock').forEach(c => {
+    c.innerText = timeString;
+  });
 }, 1000);
 
-function switchScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
-  
-  clearInterval(countdownInterval);
-  document.getElementById('app-frame').classList.remove('emergency-bg');
-  stopEmergencyFeatures(); 
 
-  if (screenId === 'warning-screen') {
-    let timeLeft = 59;
-    const timerDisplay = document.getElementById('timer');
-    timerDisplay.innerText = "00:59"; 
-    
-    countdownInterval = setInterval(() => {
-      timeLeft--;
-      timerDisplay.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-      if (timeLeft <= 0) { 
-        clearInterval(countdownInterval); 
-        switchScreen('emergency-screen'); 
-      }
-    }, 1000); 
+function switchScreen(screenId) {
+
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+
+  const screen = document.getElementById(screenId);
+
+  if (!screen) {
+    console.error("Screen not found:", screenId);
+    return;
   }
-  
+
+  screen.classList.add('active');
+
+  clearInterval(countdownInterval);
+
+  const appFrame = document.getElementById('app-frame');
+
+  if (appFrame) {
+    appFrame.classList.remove('emergency-bg');
+  }
+
+  stopEmergencyFeatures();
+
+
+  // WARNING SCREEN
+  if (screenId === 'warning-screen') {
+
+    let timeLeft = 59;
+
+    const timerDisplay =
+      document.getElementById('timer');
+
+    if (timerDisplay) {
+      timerDisplay.innerText = "00:59";
+    }
+
+    countdownInterval = setInterval(() => {
+
+      timeLeft--;
+
+      if (timerDisplay) {
+        timerDisplay.innerText =
+          `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+      }
+
+      if (timeLeft <= 0) {
+
+        clearInterval(countdownInterval);
+
+        switchScreen('emergency-screen');
+      }
+
+    }, 1000);
+  }
+
+
+  // EMERGENCY SCREEN
   if (screenId === 'emergency-screen') {
-    document.getElementById('app-frame').classList.add('emergency-bg');
+
+    if (appFrame) {
+      appFrame.classList.add('emergency-bg');
+    }
+
     startEmergencyFeatures();
   }
 }
 
+
 // ==========================================
-// 2. EMERGENCY FEATURES (GPS & CAMERA)
+// 3. EMERGENCY FEATURES
+// GPS + CAMERA
 // ==========================================
+
 function startEmergencyFeatures() {
-  const coordsDisplay = document.getElementById('real-coords');
-  const showFallbackGPS = () => { coordsDisplay.innerText = "12.9716° N, 77.5946° E"; };
-  const gpsTimeout = setTimeout(showFallbackGPS, 3000);
 
+  const coordsDisplay =
+    document.getElementById('real-coords');
+
+
+  function showFallbackGPS() {
+
+    if (coordsDisplay) {
+      coordsDisplay.innerText =
+        "12.9716° N, 77.5946° E";
+    }
+  }
+
+
+  const gpsTimeout =
+    setTimeout(showFallbackGPS, 3000);
+
+
+  // GPS
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        clearTimeout(gpsTimeout);
-        const lat = position.coords.latitude.toFixed(4);
-        const lon = position.coords.longitude.toFixed(4);
-        coordsDisplay.innerText = `${lat}° N, ${lon}° E`;
-      },
-      (error) => { clearTimeout(gpsTimeout); showFallbackGPS(); },
-      { timeout: 3000 } 
-    );
-  } else { showFallbackGPS(); }
 
-  const video = document.getElementById('camera-stream');
-  const placeholder = document.getElementById('cam-placeholder');
-  
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.geolocation.getCurrentPosition(
+
+      (position) => {
+
+        clearTimeout(gpsTimeout);
+
+        if (!coordsDisplay) return;
+
+        const lat =
+          position.coords.latitude.toFixed(4);
+
+        const lon =
+          position.coords.longitude.toFixed(4);
+
+        coordsDisplay.innerText =
+          `${lat}° N, ${lon}° E`;
+      },
+
+      () => {
+
+        clearTimeout(gpsTimeout);
+
+        showFallbackGPS();
+      },
+
+      {
+        timeout: 3000
+      }
+    );
+
+  } else {
+
+    showFallbackGPS();
+  }
+
+
+  // CAMERA
+  const video =
+    document.getElementById('camera-stream');
+
+  const placeholder =
+    document.getElementById('cam-placeholder');
+
+
+  if (
+    navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia &&
+    video &&
+    placeholder
+  ) {
+
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true
+      })
+
       .then((stream) => {
+
         cameraStream = stream;
+
         video.srcObject = stream;
+
         video.style.display = 'block';
+
         placeholder.style.display = 'none';
       })
-      .catch((error) => { placeholder.innerText = "Camera Access Denied"; });
+
+      .catch(() => {
+
+        placeholder.innerText =
+          "Camera Access Denied";
+      });
   }
 }
+
 
 function stopEmergencyFeatures() {
+
   if (cameraStream) {
-    cameraStream.getTracks().forEach(track => track.stop());
+
+    cameraStream
+      .getTracks()
+      .forEach(track => track.stop());
+
     cameraStream = null;
-    document.getElementById('camera-stream').style.display = 'none';
-    document.getElementById('cam-placeholder').style.display = 'block';
+
+
+    const video =
+      document.getElementById('camera-stream');
+
+    const placeholder =
+      document.getElementById('cam-placeholder');
+
+
+    if (video) {
+      video.style.display = 'none';
+    }
+
+    if (placeholder) {
+      placeholder.style.display = 'block';
+    }
   }
 }
 
-// ==========================================
-// 3. AI CHATBOT LOGIC
-// ==========================================
-function sendFakeMessage() {
-  const input = document.getElementById('chat-text');
-  const chatHistory = document.getElementById('chat-history');
-  
-  if(input.value.trim() !== "") {
-    const userDiv = document.createElement('div');
-    userDiv.className = 'chat-bubble chat-user';
-    userDiv.innerText = input.value;
-    chatHistory.appendChild(userDiv);
-    input.value = "";
-    chatHistory.scrollTop = chatHistory.scrollHeight;
 
-    setTimeout(() => {
-      const aiDiv = document.createElement('div');
-      aiDiv.className = 'chat-bubble chat-ai';
-      aiDiv.innerText = "Understood. I have logged this to your Cloud Backup. Stay calm, help is a tap away below.";
-      chatHistory.appendChild(aiDiv);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }, 1000);
+// ==========================================
+// 4. GEMINI SAFE CALL
+// ==========================================
+
+async function sendFakeMessage() {
+
+  const input =
+    document.getElementById('chat-text');
+
+  const chatHistory =
+    document.getElementById('chat-history');
+
+
+  if (!input || !chatHistory) {
+    console.error("SafeCall elements not found.");
+    return;
   }
-}
 
-// ==========================================
-// 4. NEW: BATTERY PROTECT
-// ==========================================
-if ('getBattery' in navigator) {
-  navigator.getBattery().then(function(battery) {
-    function updateBatteryUI() {
-      // Get battery as a whole number (e.g., 85)
-      let level = Math.round(battery.level * 100);
-      
-      // Update all battery icons on the screen
-      document.querySelectorAll('.icons').forEach(icon => {
-        icon.innerText = `📶 4G 🔋 ${level}%`;
-        
-        // If battery is less than 20%, trigger Low Power Protection
-        if(level <= 20) {
-          icon.innerText += " (Low Power)";
-          icon.style.color = "#ef4444"; // Turn text red
-          
-          // Stop heavy animations to save battery
-          let radar = document.querySelector('.radar-sweep');
-          if(radar) radar.style.display = 'none'; 
+
+  const userMessage =
+    input.value.trim();
+
+
+  if (userMessage === "") {
+    return;
+  }
+
+
+  // Show user's message
+  const userDiv =
+    document.createElement('div');
+
+  userDiv.className =
+    'chat-bubble chat-user';
+
+  userDiv.innerText =
+    userMessage;
+
+  chatHistory.appendChild(userDiv);
+
+  input.value = "";
+
+  chatHistory.scrollTop =
+    chatHistory.scrollHeight;
+
+
+  // Temporary AI message
+  const aiDiv =
+    document.createElement('div');
+
+  aiDiv.className =
+    'chat-bubble chat-ai';
+
+  aiDiv.innerText =
+    "NetramAI is thinking...";
+
+  chatHistory.appendChild(aiDiv);
+
+  chatHistory.scrollTop =
+    chatHistory.scrollHeight;
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_URL}/safecall`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message: userMessage
+          })
         }
-      });
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        `Backend returned ${response.status}`
+      );
     }
-    // Run once on load, and listen for changes
-    updateBatteryUI();
-    battery.addEventListener('levelchange', updateBatteryUI);
-  });
+
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "Gemini SafeCall:",
+      data
+    );
+
+
+    // Backend returns:
+    // { reply: "...", safety_state: "..." }
+
+    aiDiv.innerText =
+      data.reply ||
+      "I'm here with you. How are you feeling right now?";
+
+
+  } catch (error) {
+
+    console.error(
+      "SafeCall connection failed:",
+      error
+    );
+
+
+    aiDiv.innerText =
+      "I'm having trouble connecting right now. Please stay calm and use the available safety controls if you need help.";
+  }
+
+
+  chatHistory.scrollTop =
+    chatHistory.scrollHeight;
 }
 
-// ==========================================
-// 5. NEW: SHAKE TO SOS
-// ==========================================
-// Listens for physical movement of the device
-window.addEventListener('devicemotion', function(event) {
-  // Get acceleration on X, Y, and Z axes
-  let acc = event.acceleration;
-  if (!acc) return; // Ignore if device doesn't have a sensor
 
-  // Calculate total force
-  let totalForce = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
-  
-  // If force is very high (shaking violently), trigger emergency
-  if (totalForce > 25) { 
-    // Only trigger if we aren't already on the emergency screen
-    if(!document.getElementById('emergency-screen').classList.contains('active')){
-       switchScreen('emergency-screen');
+// ==========================================
+// 5. BATTERY PROTECT
+// ==========================================
+
+if ('getBattery' in navigator) {
+
+  navigator.getBattery()
+
+    .then(function(battery) {
+
+      function updateBatteryUI() {
+
+        const level =
+          Math.round(battery.level * 100);
+
+
+        document
+          .querySelectorAll('.icons')
+          .forEach(icon => {
+
+            icon.innerText =
+              `📶 4G 🔋 ${level}%`;
+
+
+            if (level <= 20) {
+
+              icon.innerText +=
+                " (Low Power)";
+
+              icon.style.color =
+                "#ef4444";
+
+
+              const radar =
+                document.querySelector(
+                  '.radar-sweep'
+                );
+
+
+              if (radar) {
+                radar.style.display =
+                  'none';
+              }
+            }
+          });
+      }
+
+
+      updateBatteryUI();
+
+
+      battery.addEventListener(
+        'levelchange',
+        updateBatteryUI
+      );
+
+    })
+
+    .catch(error => {
+
+      console.log(
+        "Battery API unavailable:",
+        error
+      );
+    });
+}
+
+
+// ==========================================
+// 6. SHAKE TO SOS
+// ==========================================
+
+let shakeCooldown = false;
+
+window.addEventListener(
+  'devicemotion',
+  function(event) {
+
+    const acc =
+      event.acceleration;
+
+
+    if (!acc) {
+      return;
     }
-  }
-});
 
-// ==========================================
-// 6. NEW: VOICE SOS
-// ==========================================
-// Uses Chrome's built-in speech recognition
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-if (SpeechRecognition) {
-  const recognition = new SpeechRecognition();
-  recognition.continuous = true; // Keep listening continuously
-  recognition.interimResults = false;
+    const totalForce =
+      Math.abs(acc.x || 0) +
+      Math.abs(acc.y || 0) +
+      Math.abs(acc.z || 0);
 
-  recognition.onresult = function(event) {
-    // Grab the latest word spoken
-    const lastResultIndex = event.results.length - 1;
-    const spokenText = event.results[lastResultIndex][0].transcript.toLowerCase().trim();
 
-    // If the word "help" is heard, trigger the SOS
-    if (spokenText.includes('help')) {
-      if(!document.getElementById('emergency-screen').classList.contains('active')){
-         switchScreen('emergency-screen');
+    if (
+      totalForce > 25 &&
+      !shakeCooldown
+    ) {
+
+      const emergencyScreen =
+        document.getElementById(
+          'emergency-screen'
+        );
+
+
+      if (
+        emergencyScreen &&
+        !emergencyScreen.classList.contains(
+          'active'
+        )
+      ) {
+
+        shakeCooldown = true;
+
+        console.log(
+          "SHAKE SOS DETECTED"
+        );
+
+
+        switchScreen(
+          'emergency-screen'
+        );
+
+
+        setTimeout(() => {
+
+          shakeCooldown = false;
+
+        }, 5000);
       }
     }
-  };
+  }
+);
 
-  // Restart listening automatically if it pauses
-  recognition.onend = function() {
+
+// ==========================================
+// 7. VOICE SOS
+// ==========================================
+
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+
+if (SpeechRecognition) {
+
+  const recognition =
+    new SpeechRecognition();
+
+
+  recognition.continuous =
+    true;
+
+  recognition.interimResults =
+    false;
+
+  recognition.lang =
+    "en-US";
+
+
+  recognition.onresult =
+    function(event) {
+
+      const lastResultIndex =
+        event.results.length - 1;
+
+
+      const spokenText =
+        event.results[lastResultIndex][0]
+          .transcript
+          .toLowerCase()
+          .trim();
+
+
+      console.log(
+        "Voice detected:",
+        spokenText
+      );
+
+
+      if (
+        spokenText.includes("help")
+      ) {
+
+        const emergencyScreen =
+          document.getElementById(
+            'emergency-screen'
+          );
+
+
+        if (
+          emergencyScreen &&
+          !emergencyScreen.classList.contains(
+            'active'
+          )
+        ) {
+
+          console.log(
+            "VOICE SOS DETECTED"
+          );
+
+
+          switchScreen(
+            'emergency-screen'
+          );
+        }
+      }
+    };
+
+
+  recognition.onend =
+    function() {
+
+      try {
+
+        recognition.start();
+
+      } catch (error) {
+
+        console.log(
+          "Voice recognition restart failed."
+        );
+      }
+    };
+
+
+  recognition.onerror =
+    function(event) {
+
+      console.log(
+        "Voice recognition error:",
+        event.error
+      );
+    };
+
+
+  try {
+
     recognition.start();
-  };
 
-  // Start the microphone
-  recognition.start();
+    console.log(
+      "NetramAI Voice SOS activated."
+    );
+
+  } catch (error) {
+
+    console.log(
+      "Voice recognition could not start:",
+      error
+    );
+  }
+
+
+} else {
+
+  console.log(
+    "Speech Recognition is not supported by this browser."
+  );
 }
