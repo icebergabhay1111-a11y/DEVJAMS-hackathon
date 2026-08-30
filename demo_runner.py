@@ -3,9 +3,15 @@ from datetime import datetime, timedelta, timezone
 from firestore_service import get_journey
 from models import journey_from_data
 from monitoring import monitor_and_save
+from map_service import get_eta
 
 
 PLANNED_LOCATIONS = ["VIT", "Katpadi", "Home"]
+
+# Define actual route for the demo
+ORIGIN = "VIT, Chennai"
+DESTINATION = "Katpadi, Vellore"
+WAYPOINTS = ["Katpadi"]
 
 
 def get_demo_journey():
@@ -31,31 +37,42 @@ def run_scenario(choice: str) -> None:
         now + timedelta(minutes=25)
     ).isoformat()
 
+    # Compute real ETA once from Google Maps
+    base_eta_minutes = get_eta(
+        origin=ORIGIN,
+        destination=DESTINATION,
+        waypoints=WAYPOINTS,
+    )
+
     if choice == "1":
         title = "NORMAL JOURNEY"
         journey.current_location = "Katpadi"
-        journey.current_eta = 20
+        # Normal: use base ETA
+        journey.current_eta = base_eta_minutes
         response_confirmed = None
         anomaly_detected = False
 
     elif choice == "2":
         title = "ETA DELAY -> ATTENTION"
         journey.current_location = "Katpadi"
-        journey.current_eta = 35
+        # Delay: add 10 minutes to real ETA
+        journey.current_eta = base_eta_minutes + 10
         response_confirmed = None
         anomaly_detected = False
 
     elif choice == "3":
         title = "DEVIATION + DELAY + ANOMALY -> CONCERN"
         journey.current_location = "Unknown Road"
-        journey.current_eta = 38
+        # Deviation + delay: add 13 minutes to real ETA
+        journey.current_eta = base_eta_minutes + 13
         response_confirmed = None
         anomaly_detected = True
 
     elif choice == "4":
         title = "UNANSWERED SAFETY CHECK -> CONCERN"
         journey.current_location = "Unknown Road"
-        journey.current_eta = 38
+        # Similar to scenario 3, but with unanswered safety check
+        journey.current_eta = base_eta_minutes + 13
         response_confirmed = False
         anomaly_detected = True
 
