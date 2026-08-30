@@ -6,10 +6,10 @@ from monitoring import monitor_and_save
 from map_service import get_eta
 
 
-PLANNED_LOCATIONS = ["VIT", "Katpadi", "Home"]
+PLANNED_LOCATIONS = ["VIT Vellore", "Tamil Nadu", "Katpadi, Vellore"]
 
 # Define actual route for the demo
-ORIGIN = "VIT, Chennai"
+ORIGIN = "VIT Vellore, Tamil Nadu"
 DESTINATION = "Katpadi, Vellore"
 WAYPOINTS = ["Katpadi"]
 
