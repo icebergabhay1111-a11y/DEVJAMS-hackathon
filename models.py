@@ -30,6 +30,7 @@ class Journey:
     journey_started_at: datetime | str | None = None
     planned_arrival_at: datetime | str | None = None
     driver_trust_score: float = 95.0
+    platform_rating: float | None = None
 
     def get_eta_overrun_minutes(self) -> int:
         return max(0, self.current_eta - self.expected_eta)
@@ -88,6 +89,7 @@ def journey_from_data(data: dict[str, Any]) -> Journey:
         "journey_started_at",
         "planned_arrival_at",
         "driver_trust_score",
+        "platform_rating",
     }
 
     journey_data = {

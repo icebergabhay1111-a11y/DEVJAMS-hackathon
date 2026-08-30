@@ -41,7 +41,7 @@ save_journey(
         "vehicle": "Cab",
         "driver": "Demo Driver",
         "planned_route": "VIT -> Katpadi -> Home",
-        "expected_eta": 25,
+        "expected_eta": 230,
         "current_location": "Katpadi",
         "current_eta": 20,
         "state": "NORMAL",
