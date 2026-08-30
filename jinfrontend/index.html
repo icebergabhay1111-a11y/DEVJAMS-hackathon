@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>NetramAI — Every Second Matters</title>
+<meta name="description" content="NetramAI — an intelligent personal safety platform that helps users before, during, and after a journey.">
+<meta name="theme-color" content="#0a0612">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= AMBIENT BACKGROUND ================= -->
+<div class="ambient" aria-hidden="true">
+  <div class="ambient-glow ambient-glow--top"></div>
+  <div class="ambient-glow ambient-glow--bottom"></div>
+  <div class="ambient-grid"></div>
+</div>
+
+<!-- ================= DEVICE FRAME ================= -->
+<div class="device-frame">
+  <div class="device-notch" aria-hidden="true"></div>
+
+  <div class="app" id="app">
+
+    <!-- ============= SPLASH SCREEN ============= -->
+    <div class="splash" id="splash">
+      <div class="splash-glow"></div>
+      <div class="splash-content">
+        <div class="splash-logo">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L4 5v6c0 5.2 3.4 9.9 8 11 4.6-1.1 8-5.8 8-11V5l-8-3z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="white" fill-opacity="0.12"/></svg>
+        </div>
+        <h1 class="splash-title">Netram<span>AI</span></h1>
+        <p class="splash-tag">&ldquo;Every Second Matters.&rdquo;</p>
+        <div class="splash-loader"><div class="splash-loader-bar" id="splashBar"></div></div>
+        <p class="splash-sub">Prevention, not just panic.</p>
+      </div>
+      <p class="splash-footer">Team NetramAI · DevJams Hackathon, VIT</p>
+    </div>
+
+    <!-- ============= FAKE STATUS BAR ============= -->
+    <div class="status-bar">
+      <span class="status-time" id="statusTime">9:41</span>
+      <div class="status-icons">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="currentColor" opacity="0.9"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.8c3.9-3.4 9.1-3.4 13 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3.8 7.5c2.4-2 5.9-2 8.3 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="10.2" r="1.15" fill="currentColor"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.75" y="0.75" width="19.5" height="10.5" rx="2.5" stroke="currentColor" stroke-width="1"/><rect x="2" y="2" width="15" height="8" rx="1.2" fill="currentColor"/><rect x="21" y="4" width="1.6" height="4" rx="0.6" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <!-- ============= SCREENS ============= -->
+    <main class="screens" id="screens">
+
+      <!-- ======================================================= HOME -->
+      <section class="screen active" id="screen-home" data-screen="home">
+        <header class="screen-header">
+          <div class="brand-row">
+            <div class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6c0 5.2 3.4 9.9 8 11 4.6-1.1 8-5.8 8-11V5l-8-3z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <p class="brand-name">Netram<span>AI</span></p>
+              <p class="brand-sub" id="homeSubline">Every second matters.</p>
+            </div>
+          </div>
+          <button class="icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span class="icon-dot" id="notifDot" hidden></span>
+          </button>
+        </header>
+
+        <!-- ---- IDLE: plan a journey ---- -->
+        <div class="panel" id="journeyIdle">
+
+          <div class="card card--gradient plan-card">
+            <p class="eyebrow">START A JOURNEY</p>
+            <h2 class="plan-title">Where are you headed?</h2>
+
+            <label class="field">
+              <span class="field-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 22s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.7"/></svg>
+              </span>
+              <input type="text" id="destinationInput" value="Home" placeholder="Enter destination" autocomplete="off">
+            </label>
+
+            <p class="field-label">Mode of travel</p>
+            <div class="chip-row" id="vehicleRow">
+              <button class="chip chip--active" data-vehicle="cab">🚕 Cab</button>
+              <button class="chip" data-vehicle="auto">🛺 Auto</button>
+              <button class="chip" data-vehicle="bike">🏍️ Bike</button>
+              <button class="chip" data-vehicle="walk">🚶 Walk</button>
+            </div>
+
+            <p class="field-label">Notify Guardian</p>
+            <div class="chip-row" id="guardianChipRow"></div>
+
+            <button class="btn btn--primary btn--full" id="startJourneyBtn">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Start Journey
+            </button>
+            <p class="plan-hint">Vehicle, destination, and a trusted Guardian are set in seconds.</p>
+          </div>
+
+          <div class="card safe-route-card">
+            <div class="safe-route-head">
+              <span class="feature-ico feature-ico--violet">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </span>
+              <div>
+                <p class="safe-route-title">Safe Route AI</p>
+                <p class="safe-route-desc">Recommends via <b>MG Road</b> — well-lit, high footfall <span class="tag-soft">+3 min</span></p>
+              </div>
+            </div>
+            <label class="switch-row">
+              <span>Prefer safer routes automatically</span>
+              <span class="switch switch--on" data-toggle="preferSafeRoute"><i></i></span>
+            </label>
+          </div>
+
+          <p class="section-label">What sets us apart</p>
+          <div class="feature-grid" id="featureGrid"></div>
+
+          <p class="section-label">Built for you</p>
+          <div class="audience-scroller" id="audienceScroller"></div>
+
+        </div>
+
+        <!-- ---- ACTIVE: monitoring dashboard ---- -->
+        <div class="panel hidden" id="journeyActive">
+
+          <div class="status-pill-wrap">
+            <div class="status-pill" id="statusPill">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusPillText">Monitoring Active</span>
+            </div>
+            <button class="text-btn" id="endJourneyBtn">End</button>
+          </div>
+
+          <div class="card gauge-card">
+            <div class="gauge-wrap">
+              <svg viewBox="0 0 140 140" class="gauge-svg">
+                <circle cx="70" cy="70" r="60" class="gauge-track"/>
+                <circle cx="70" cy="70" r="60" class="gauge-fill" id="gaugeFill"/>
+              </svg>
+              <div class="gauge-center">
+                <span class="gauge-number" id="gaugeNumber">96</span>
+                <span class="gauge-caption">AI SAFETY SCORE</span>
+              </div>
+            </div>
+
+            <div class="status-rows">
+              <div class="status-row">
+                <span>AI Protection</span>
+                <b class="ok" id="rowAiProtection">ACTIVE</b>
+              </div>
+              <div class="status-row">
+                <span>Guardian Watch</span>
+                <b class="ok" id="rowGuardianWatch">ACTIVE</b>
+              </div>
+              <div class="status-row">
+                <span>Route</span>
+                <b class="ok" id="rowRoute">ON TRACK</b>
+              </div>
+              <div class="status-row">
+                <span>ETA</span>
+                <b id="rowEta">24 min</b>
+              </div>
+              <div class="status-row">
+                <span>Battery</span>
+                <b class="ok" id="rowBattery">82%</b>
+              </div>
+              <div class="status-row">
+                <span>Cloud Backup</span>
+                <b id="rowCloud">Idle</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="card route-card">
+            <p class="card-title-sm">Live Route</p>
+            <svg viewBox="0 0 300 90" class="route-svg">
+              <path d="M20,70 C 80,20 120,80 160,40 S 250,20 280,25" fill="none" stroke="url(#routeGrad)" stroke-width="3" stroke-linecap="round" id="routePath"/>
+              <defs>
+                <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#8b5cf6"/>
+                  <stop offset="100%" stop-color="#34d399"/>
+                </linearGradient>
+              </defs>
+              <circle cx="20" cy="70" r="6" fill="#8b5cf6"/>
+              <circle cx="280" cy="25" r="6" fill="#34d399"/>
+            </svg>
+            <div class="route-labels"><span>Start</span><span id="routeDestLabel">Home</span></div>
+          </div>
+
+          <div class="card driver-card" id="driverCard">
+            <p class="card-title-sm">Driver Trust</p>
+            <div class="driver-top">
+              <div class="driver-avatar">SK</div>
+              <div class="driver-info">
+                <p class="driver-name">Suresh Kumar <span class="driver-plate">TN 09 AB 4471</span></p>
+                <p class="driver-stars">★★★★☆ <span>4.6 (Ola, imported)</span></p>
+              </div>
+              <div class="trust-score">
+                <span id="trustScoreNum">97</span>
+                <small>TRUST</small>
+              </div>
+            </div>
+            <div class="trust-bar"><div class="trust-bar-fill" id="trustBarFill" style="width:97%"></div></div>
+            <p class="driver-meta">128 trips · 0 flags · internal history + platform rating correlated</p>
+          </div>
+
+          <p class="section-label">Graduated Response Engine</p>
+          <div class="card stepper-card">
+            <div class="stepper" id="stepper">
+              <div class="step" data-step="0"><span class="step-dot"></span><span class="step-label">Normal</span></div>
+              <div class="step" data-step="1"><span class="step-dot"></span><span class="step-label">Attention</span></div>
+              <div class="step" data-step="2"><span class="step-dot"></span><span class="step-label">Concern</span></div>
+              <div class="step" data-step="3"><span class="step-dot"></span><span class="step-label">Are You Safe?</span></div>
+              <div class="step" data-step="4"><span class="step-dot"></span><span class="step-label">Help</span></div>
+              <div class="step" data-step="5"><span class="step-dot"></span><span class="step-label">Emergency</span></div>
+            </div>
+          </div>
+
+          <details class="demo-panel">
+            <summary>Demo Controls <span>for judges</span></summary>
+            <p class="demo-desc">Simulate the connected journey flow live.</p>
+            <div class="demo-btn-row">
+              <button class="btn btn--ghost" id="btnSimulateDeviation">Simulate Deviation</button>
+              <button class="btn btn--ghost btn--danger" id="btnTriggerEmergency">Trigger Emergency</button>
+              <button class="btn btn--ghost" id="btnDrainBattery">Drain Battery</button>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- ======================================================= GUARDIAN -->
+      <section class="screen" id="screen-guardian" data-screen="guardian">
+        <header class="screen-header">
+          <div>
+            <h2 class="screen-title">Guardian Watch</h2>
+            <p class="screen-sub">Trusted contacts stay informed automatically.</p>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="card">
+            <label class="switch-row">
+              <span>Live location sharing</span>
+              <span class="switch switch--on" data-toggle="liveLocation"><i></i></span>
+            </label>
+            <label class="switch-row">
+              <span>Auto-notify on deviation</span>
+              <span class="switch switch--on" data-toggle="autoNotify"><i></i></span>
+            </label>
+          </div>
+
+          <p class="section-label">Your Guardians</p>
+          <div class="guardian-list" id="guardianList"></div>
+
+          <button class="btn btn--outline btn--full" id="addGuardianBtn">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add Guardian
+          </button>
+
+          <div class="card info-card">
+            <p>Trusted contacts stay informed automatically — no manual updates mid-journey. Guardians see live location, ETA changes, and are alerted the moment NetramAI escalates.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================= SAFECALL -->
+      <section class="screen" id="screen-safecall" data-screen="safecall">
+        <header class="screen-header">
+          <div>
+            <h2 class="screen-title">SafeCall</h2>
+            <p class="screen-sub">A natural AI companion for uneasy moments.</p>
+          </div>
+        </header>
+
+        <div class="panel panel--safecall">
+          <div class="call-card">
+            <div class="call-avatar" id="callAvatar">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6c0 5.2 3.4 9.9 8 11 4.6-1.1 8-5.8 8-11V5l-8-3z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="call-state" id="callState">Tap to start a SafeCall</p>
+            <p class="call-timer" id="callTimer" hidden>00:00</p>
+            <div class="waveform" id="waveform">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <button class="btn btn--primary btn--full" id="callToggleBtn">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M15.05 5A5 5 0 0119 9m-4-8a9 9 0 018 8M4 4l16 16" stroke="currentColor" stroke-width="0" fill="none"/><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.3 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C11.8 21 3 12.2 3 1c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              Start SafeCall
+            </button>
+          </div>
+
+          <div class="chat-window" id="chatWindow">
+            <div class="chat-msg chat-msg--bot">
+              <div class="chat-bubble">Hey, I'm here with you. Want to talk while you get home? No emergency needs to be declared — I'm just here.</div>
+            </div>
+          </div>
+
+          <form class="chat-input-row" id="chatForm">
+            <input type="text" id="chatInput" placeholder="Type to SafeCall…" autocomplete="off">
+            <button type="submit" class="icon-btn icon-btn--send" aria-label="Send">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ======================================================= REPORT / SAFETY GUIDANCE -->
+      <section class="screen" id="screen-report" data-screen="report">
+        <header class="screen-header">
+          <div>
+            <h2 class="screen-title">Safety Guidance</h2>
+            <p class="screen-sub">Tell NetramAI what's wrong — get guided to safety.</p>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="card">
+            <p class="field-label">Describe what happened</p>
+            <textarea id="reportInput" rows="4" placeholder="A private, judgment-free space to type what's going on. You don't need to be ready to speak or call anyone."></textarea>
+            <button class="btn btn--primary btn--full" id="reportSubmitBtn">Get Guided to Safety</button>
+          </div>
+
+          <div class="hidden" id="reportResults">
+            <p class="section-label">Personalized Safety Steps</p>
+            <div class="card">
+              <ul class="steps-list" id="stepsList"></ul>
+            </div>
+
+            <p class="section-label">Matched Helplines</p>
+            <div class="helpline-list" id="helplineList"></div>
+
+            <p class="section-label">Direct Govt Portal Links</p>
+            <div class="portal-list" id="portalList"></div>
+
+            <div class="card info-card info-card--amber">
+              <p><b>Not legal advice.</b> This guidance is informational and always routes to verified official sources.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================= PROFILE -->
+      <section class="screen" id="screen-profile" data-screen="profile">
+        <header class="screen-header">
+          <div>
+            <h2 class="screen-title">Profile &amp; Privacy</h2>
+            <p class="screen-sub">Built to earn trust, not just downloads.</p>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="card profile-card">
+            <div class="profile-avatar">G</div>
+            <div>
+              <p class="profile-name">Guest User</p>
+              <p class="profile-badge">Prototype v1.0 · Demo Mode</p>
+            </div>
+          </div>
+
+          <p class="section-label">Protection Settings</p>
+          <div class="card">
+            <label class="switch-row">
+              <span>Battery Protect <small>prioritizes location &amp; Guardian as battery runs low</small></span>
+              <span class="switch switch--on" data-toggle="batteryProtect"><i></i></span>
+            </label>
+            <label class="switch-row">
+              <span>Cloud Evidence Backup <small>preserves evidence beyond the device</small></span>
+              <span class="switch switch--on" data-toggle="cloudBackup"><i></i></span>
+            </label>
+            <label class="switch-row">
+              <span>Shake to SOS <small>shake your phone firmly to trigger emergency</small></span>
+              <span class="switch" id="shakeToggle" data-toggle="shakeSOS"><i></i></span>
+            </label>
+            <label class="switch-row">
+              <span>Voice SOS (beta) <small>say “netram help” to trigger emergency</small></span>
+              <span class="switch" id="voiceToggle" data-toggle="voiceSOS"><i></i></span>
+            </label>
+          </div>
+
+          <p class="section-label">Responsible AI &amp; Privacy</p>
+          <div class="card privacy-grid" id="privacyGrid"></div>
+
+          <div class="card info-card">
+            <p class="card-title-sm">How AI is used</p>
+            <p>AI powers natural conversation — like SafeCall — and helps explain context. Critical transitions, like entering Emergency Mode, always run on deterministic app logic driven by explicit user choice — never an AI model deciding alone.</p>
+          </div>
+
+          <p class="section-label">Roadmap</p>
+          <div class="roadmap-cols">
+            <div class="card roadmap-col">
+              <p class="roadmap-head roadmap-head--done">Built for Demo</p>
+              <ul class="roadmap-list" id="roadmapDone"></ul>
+            </div>
+            <div class="card roadmap-col">
+              <p class="roadmap-head roadmap-head--next">Coming Next</p>
+              <ul class="roadmap-list" id="roadmapNext"></ul>
+            </div>
+          </div>
+
+          <p class="footer-quote">&ldquo;Your safety shouldn't depend on luck.&rdquo;</p>
+          <p class="footer-credit">Team NetramAI · DevJams Hackathon, VIT<br>Prototype built for demonstration purposes.</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ============= FLOATING SOS BUTTON ============= -->
+    <button class="sos-fab" id="sosFab" aria-label="Hold for manual SOS">
+      <span class="sos-fab-ring"></span>
+      <span class="sos-fab-progress" id="sosFabProgress"></span>
+      <span class="sos-fab-label">SOS</span>
+    </button>
+
+    <!-- ============= BOTTOM NAV ============= -->
+    <nav class="bottom-nav">
+      <button class="nav-btn nav-btn--active" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-btn" data-tab="guardian">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 20v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1M10 11a4 4 0 100-8 4 4 0 000 8zM20 20v-1a3.5 3.5 0 00-2.5-3.4M15 3.6a3.5 3.5 0 010 6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Guardian</span>
+      </button>
+      <button class="nav-btn" data-tab="safecall">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.3 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C11.8 21 3 12.2 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <span>SafeCall</span>
+      </button>
+      <button class="nav-btn" data-tab="report">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9L2.5 17a1.6 1.6 0 001.4 2.4h16.2a1.6 1.6 0 001.4-2.4L13.7 3.9a1.6 1.6 0 00-2.8 0z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Report</span>
+      </button>
+      <button class="nav-btn" data-tab="profile">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+    <!-- ============= ARE YOU SAFE SHEET ============= -->
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet" id="areYouSafeSheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <span class="status-pill status-pill--amber sheet-pill">
+        <span class="status-dot status-dot--amber"></span> Unusual Journey Detected
+      </span>
+      <h3 class="sheet-title">Are you safe?</h3>
+      <p class="sheet-sub">We noticed a change in your journey.</p>
+
+      <div class="status-rows">
+        <div class="status-row"><span>Route</span><b class="warn">DEVIATION</b></div>
+        <div class="status-row"><span>ETA</span><b class="warn">24 → 37 min</b></div>
+        <div class="status-row"><span>Safety Score</span><b class="warn">68</b></div>
+        <div class="status-row"><span>Guardian</span><b class="ok">CONNECTED</b></div>
+      </div>
+
+      <div class="sheet-actions">
+        <button class="btn btn--safe btn--full" id="btnImSafe">I'm Safe</button>
+        <button class="btn btn--neutral btn--full" id="btnMoreTime">Give me a minute</button>
+        <button class="btn btn--danger btn--full" id="btnNeedHelp">I need help</button>
+      </div>
+    </div>
+
+    <!-- ============= EMERGENCY OVERLAY ============= -->
+    <div class="emergency-overlay" id="emergencyOverlay">
+      <div class="emergency-content">
+        <span class="status-pill status-pill--red">
+          <span class="status-dot status-dot--red"></span> Emergency Mode
+        </span>
+
+        <div class="sos-pulse">
+          <span class="sos-pulse-ring r1"></span>
+          <span class="sos-pulse-ring r2"></span>
+          <span class="sos-pulse-core">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6c0 5.2 3.4 9.9 8 11 4.6-1.1 8-5.8 8-11V5l-8-3z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 8v4.5M12 15.2h.01" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+
+        <!-- ---- LIVE EVIDENCE: camera feed + geo coordinates ---- -->
+        <div class="evidence-stack">
+
+          <div class="cam-card" id="camCard">
+            <video id="camVideo" class="cam-video" autoplay playsinline muted></video>
+
+            <div class="cam-fallback" id="camFallback">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 012-2h1.2l.9-1.4A2 2 0 019.7 3.6h4.6a2 2 0 011.6 1L16.8 6H18a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" stroke="currentColor" stroke-width="1.5"/></svg>
+              <p class="cam-fallback-title" id="camFallbackTitle">Camera Preview</p>
+              <p class="cam-fallback-sub" id="camFallbackSub">Enable camera access to start the live feed</p>
+            </div>
+
+            <div class="cam-badge">
+              <span class="cam-rec-dot"></span> LIVE
+            </div>
+            <div class="cam-timestamp" id="camTimestamp">00:00</div>
+          </div>
+
+          <div class="geo-card">
+            <div class="geo-row">
+              <span class="geo-ico">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 22s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.7"/></svg>
+              </span>
+              <div class="geo-text">
+                <p class="geo-label">Live GPS Coordinates</p>
+                <p class="geo-coords" id="geoCoords">Acquiring signal…</p>
+              </div>
+              <span class="geo-pulse-dot" id="geoPulseDot"></span>
+            </div>
+            <div class="geo-meta">
+              <span id="geoAccuracy">± — m accuracy</span>
+              <span id="geoUpdated">—</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="status-rows">
+          <div class="status-row"><span>Location Sharing</span><b class="danger">ACTIVE</b></div>
+          <div class="status-row"><span>Guardian Notified</span><b class="danger" id="rowGuardianNotified">SENT</b></div>
+          <div class="status-row"><span>Audio / Camera</span><b class="danger">ACTIVE</b></div>
+          <div class="status-row"><span>Cloud Backup</span><b class="danger" id="rowEmergencyCloud">SYNCING</b></div>
+        </div>
+
+        <button class="hold-cancel" id="holdCancelBtn">
+          <span class="hold-cancel-fill" id="holdCancelFill"></span>
+          <span class="hold-cancel-label">Hold 3s — I'm safe now</span>
+        </button>
+        <p class="emergency-note">Only release-hold if you are actually safe. Your Guardian will be notified the emergency has ended.</p>
+      </div>
+    </div>
+
+    <!-- ============= TOASTS ============= -->
+    <div class="toast-container" id="toastContainer"></div>
+
+  </div>
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>
