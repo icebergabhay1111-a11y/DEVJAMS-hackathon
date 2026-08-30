@@ -16,3 +16,5 @@ def get_firestore_client():
 
 
 db = get_firestore_client()
+
+GOOGLE_MAPS_API_KEY = "AIzaSyCms3IgTIPVJTFGqOHRGnuChzDhF5KCVbk"

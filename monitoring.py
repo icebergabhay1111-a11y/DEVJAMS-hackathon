@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from deviation import check_route_deviation
+from driver_trust import calculate_driver_trust_score
 from firestore_service import (
     save_monitoring_result,
     save_safety_event,
@@ -62,8 +63,16 @@ def evaluate_journey(
         planned_locations=planned_locations,
     )
 
+    needs_manual_review = False
+    trust_note = None
+
     if driver_trust_score is None:
-        driver_trust_score = journey.driver_trust_score
+        if journey.platform_rating is not None:
+            driver_trust_score, trust_note, needs_manual_review = (
+                calculate_driver_trust_score(journey.platform_rating)
+            )
+        else:
+            driver_trust_score = journey.driver_trust_score
 
     state, needs_safety_check = determine_state(
         route_deviation=route_deviation,
@@ -80,11 +89,15 @@ def evaluate_journey(
         driver_trust_score=driver_trust_score,
     )
 
+    if trust_note is not None:
+        reasons.append(f"Driver trust band: {trust_note}.")
+
     return {
         "state": state,
         "safety_score": score,
         "reasons": reasons,
         "needs_safety_check": needs_safety_check,
+        "needs_manual_review": needs_manual_review,
         "signals": {
             "eta_overrun": eta_overrun,
             "eta_overrun_minutes": journey.get_eta_overrun_minutes(),
