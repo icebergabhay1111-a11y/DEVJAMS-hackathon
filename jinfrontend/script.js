@@ -658,38 +658,50 @@
     $('#screens').scrollTop = $('#screens').scrollHeight;
   }
 
-  function botReplyTo(msg) {
-    const typing = document.createElement('div');
-    typing.className = 'chat-msg chat-msg--bot';
-    typing.innerHTML = '<div class="chat-bubble typing-bubble"><span></span><span></span><span></span></div>';
-    el.chatWindow.appendChild(typing);
-    const lower = msg.toLowerCase();
-    let reply;
-    if (/scared|afraid|unsafe|nervous/.test(lower)) reply = 'That\u2019s completely understandable. I\u2019m right here with you \u2014 want me to loop in your Guardian just in case?';
-    else if (/thank/.test(lower)) reply = 'Anytime, that\u2019s what I\u2019m here for.';
-    else if (/help/.test(lower)) reply = 'If you need more than to talk, tap the red SOS button any time \u2014 I\u2019ll alert your Guardian and start evidence backup instantly.';
-    else if (/driver|cab|auto|taxi/.test(lower)) reply = 'Got it \u2014 I\u2019m keeping the driver and route in view on the dashboard while we talk.';
-    else reply = SAFECALL_REPLIES[Math.floor(Math.random() * SAFECALL_REPLIES.length)];
+async function botReplyTo(msg) {
+  const typing = document.createElement('div');
+  typing.className = 'chat-msg chat-msg--bot';
+  typing.innerHTML =
+    '<div class="chat-bubble typing-bubble">' +
+    '<span></span><span></span><span></span>' +
+    '</div>';
 
-    setTimeout(() => {
-      typing.remove();
-      addChatMsg(reply, 'bot');
-    }, 900 + Math.random() * 500);
+  el.chatWindow.appendChild(typing);
+  el.chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  $('#screens').scrollTop = $('#screens').scrollHeight;
+
+  try {
+    const response = await fetch('http://127.0.0.1:8000/safecall', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: msg
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend returned ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    typing.remove();
+
+    addChatMsg(data.reply, 'bot');
+
+  } catch (error) {
+    console.error('SafeCall backend error:', error);
+
+    typing.remove();
+
+    addChatMsg(
+      'I’m having trouble connecting to the safety service right now. Please use the SOS controls if you need immediate help.',
+      'bot'
+    );
   }
-
-  el.chatForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const val = el.chatInput.value.trim();
-    if (!val) return;
-    addChatMsg(val, 'user');
-    el.chatInput.value = '';
-    botReplyTo(val);
-  });
-
-  function formatTimer(s) {
-    const m = Math.floor(s / 60), sec = s % 60;
-    return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
-  }
+}
 
   el.callToggleBtn.addEventListener('click', () => {
     callActive = !callActive;
@@ -948,5 +960,5 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  init();
 })();
