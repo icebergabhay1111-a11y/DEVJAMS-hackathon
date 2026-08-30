@@ -2,7 +2,7 @@ from map_service import get_route
 
 
 def main():
-    origin = "VIT, Chennai"
+    origin = "VIT Vellore, Tamil Nadu"
     destination = "Katpadi, Vellore"
     waypoints = ["Katpadi"]
 
