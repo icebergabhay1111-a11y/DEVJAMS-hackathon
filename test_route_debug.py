@@ -2,7 +2,7 @@ from map_service import _call_google_maps
 
 
 def main():
-    origin = "VIT, Chennai"
+    origin = "VIT Vellore, Tamil Nadu"
     destination = "Katpadi, Vellore"
     waypoints = ["Katpadi"]
 
