@@ -1,3 +1,5 @@
+import os
+
 import firebase_admin
 from firebase_admin import credentials, firestore
 
@@ -17,4 +19,4 @@ def get_firestore_client():
 
 db = get_firestore_client()
 
-GOOGLE_MAPS_API_KEY = "AIzaSyCms3IgTIPVJTFGqOHRGnuChzDhF5KCVbk"
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "AIzaSyCms3IgTIPVJTFGqOHRGnuChzDhF5KCVbk")

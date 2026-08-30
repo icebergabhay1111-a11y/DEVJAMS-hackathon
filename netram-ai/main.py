@@ -1,35 +1,30 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from gemini_service import safe_call
-from safety_controller import SafetyController
+from response_engine import ResponseEngine
 
 
-app = FastAPI(title="NetramAI API")
+app = FastAPI(title="NetramAI")
 
-controller = SafetyController()
+# One shared safety controller
+controller = ResponseEngine()
 
 
-# -----------------------------
-# Request Models
-# -----------------------------
-
-class SafeCallRequest(BaseModel):
-    message: str
-
+# ---------------------------------------------------------
+# REQUEST MODELS
+# ---------------------------------------------------------
 
 class EventRequest(BaseModel):
     event: str
 
 
-class CheckInRequest(BaseModel):
+class SafeCallRequest(BaseModel):
     message: str
-    event: str
 
 
-# -----------------------------
-# Root Endpoint
-# -----------------------------
+# ---------------------------------------------------------
+# HEALTH CHECK
+# ---------------------------------------------------------
 
 @app.get("/")
 def root():
@@ -39,49 +34,74 @@ def root():
     }
 
 
-# -----------------------------
-# SafeCall Endpoint
-# -----------------------------
+# ---------------------------------------------------------
+# SAFETY STATE
+# ---------------------------------------------------------
 
-@app.post("/safecall")
-def safecall(request: SafeCallRequest):
-
-    reply = safe_call(request.message)
-
+@app.get("/state")
+def get_state():
     return {
-        "reply": reply,
         "safety_state": controller.get_state()
     }
 
 
-# -----------------------------
-# Safety Event Endpoint
-# -----------------------------
+# ---------------------------------------------------------
+# MONITORING EVENT
+# ---------------------------------------------------------
 
 @app.post("/event")
 def handle_event(request: EventRequest):
 
-    new_state = controller.handle_event(request.event)
+    new_state = controller.transition(request.event)
 
     return {
         "event": request.event,
-        "safety_state": new_state
+        "safety_state": new_state.value
     }
 
 
-# -----------------------------
-# Combined SafeCall + Event
-# -----------------------------
+# ---------------------------------------------------------
+# USER SAFETY ACTIONS
+# ---------------------------------------------------------
 
 @app.post("/check-in")
-def check_in(request: CheckInRequest):
+def check_in(request: EventRequest):
 
-    reply = safe_call(request.message)
+    new_state = controller.transition(request.event)
 
-    new_state = controller.handle_event(request.event)
+    return {
+        "event": request.event,
+        "safety_state": new_state.value
+    }
+
+
+# ---------------------------------------------------------
+# SAFECALL
+# ---------------------------------------------------------
+
+@app.post("/safecall")
+def safecall(request: SafeCallRequest):
+
+    # Temporary response until Gemini integration is connected.
+    message = request.message.lower()
+
+    if "emergency" in message or "help" in message:
+        reply = (
+            "I'm here with you. If you are in immediate danger, "
+            "please use the SOS control or contact emergency services."
+        )
+    elif "nervous" in message or "scared" in message:
+        reply = (
+            "I'm right here with you. Take a slow, deep breath. "
+            "Would you like to tell me what's making you nervous?"
+        )
+    else:
+        reply = (
+            "I'm here with you. Tell me what's going on "
+            "and I'll stay with you."
+        )
 
     return {
         "reply": reply,
-        "event": request.event,
-        "safety_state": new_state
+        "safety_state": controller.get_state()
     }
